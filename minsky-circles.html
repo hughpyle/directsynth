@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<!-- 
+Copyright (c) 2013 Hugh Pyle. All rights reserved.
+-->
+<head>
+<title>Minsky circle drawing</title>
+<style type="text/css">
+body { font-family: sans-serif; }
+</style>
+<script type="text/javascript">
+//<![CDATA[
+var x, y, t, prev_y;
+var w, h;
+var running = 0;
+var delay = 100;
+var grid, ctx;
+var scope, sctx;
+var ex, ey, edx, edy;
+
+function axesOnCanvas( canvas, color, offset )
+{
+    var context = canvas.getContext( "2d" );
+
+    // Center at (0,0)
+    context.translate( offset, canvas.height/2 );
+    context.scale( canvas.width/4, -canvas.height/4 );
+    context.lineWidth=0.01;
+    
+    // Draw some axes for reference
+    context.strokeStyle = color;
+    context.fillStyle = color;
+    context.beginPath();
+    context.moveTo(-3,0); context.lineTo(5,0);
+    context.moveTo(0,-3); context.lineTo(0,3);
+    context.moveTo(-0.05, 1); context.lineTo(0.05,1);
+    context.moveTo(-0.05, -1); context.lineTo(0.05,-1);
+    context.moveTo(1, -0.05); context.lineTo(1,0.05);
+    context.moveTo(-1, -0.05); context.lineTo(-1,0.05);
+    context.stroke();
+    
+    return context;
+}
+
+function point( context, x, y, color )
+{
+    context.strokeStyle = color;
+    context.fillStyle = color;
+    context.beginPath();
+    context.arc( x, y, 0.01, 0, 2*Math.PI );
+    context.stroke();
+    context.fill();
+}
+
+function stopstart()
+{
+    running = 1-running;
+    if( !ctx ) init();
+    var btn = document.getElementById('run');
+    if(running)
+    {
+        btn.value = "stop";
+        setTimeout( loop, delay );
+    }
+    else
+    {
+        btn.value = "start";
+    }
+}
+
+function init()
+{
+    grid = document.getElementById( "grid" );
+    if( !grid.getContext ) { alert( "Sorry, failed" ); return; }
+    w = grid.width;
+    h = grid.height;
+    grid.width = w;
+
+    ex = document.getElementById('x');
+    ey = document.getElementById('y');
+    edx = document.getElementById('dx');
+    edy = document.getElementById('dy');
+
+    scope = document.getElementById( "scope" );
+    scope.width = scope.width;
+    
+    // Initaliase a 2D drawing context
+    ctx = axesOnCanvas( grid, "lightblue", w/2 );
+    sctx = axesOnCanvas( scope, "orange", w/20 );
+
+    // Initialize the looper
+    x = parseFloat(ex.value);
+    y = parseFloat(ey.value);
+    dx = edx.value;
+    dy = edy.value;
+    prev_y=y;
+    t = 0;
+}
+
+function deltacalc( points_per_circle )
+{
+    var dd = 2 * Math.sin( Math.PI/points_per_circle );
+    return dd; // points_per_circle/6;
+}
+
+function loop()
+{
+    // Draw a little point
+    // point( ctx, x, (y+prev_y)/2, "#000000" );
+    point( ctx, x, y, "#000000" );
+    
+    // Draw x, y points on the scope trace
+    point( sctx, t, x, "red" );
+    point( sctx, t, y, "green" );
+    t+=parseFloat(dx)/3;
+    
+    // Iterate once
+    prev_y=y;
+    try
+    {
+        x = x + ( eval(dy) * y );
+        y = y - ( eval(dx) * x );
+    }
+    catch( _ex ) {}
+    if( t > 1000 ) stopstart();
+    if( running ) setTimeout( loop, delay );
+}
+
+
+// all the above dup'd for the 3-phase version
+var x3, y3, z3, t3;
+var d3;
+var running3 = 0;
+var delay3 = 100;
+var scope3, sctx3;
+
+function stopstart3()
+{
+    running3 = 1-running3;
+    if( !sctx3 ) init3();
+    var btn3 = document.getElementById('run3');
+    if(running3)
+    {
+        btn3.value = "stop";
+        setTimeout( loop3, delay3 );
+    }
+    else
+    {
+        btn3.value = "start";
+    }
+}
+
+function init3()
+{
+    scope3 = document.getElementById( "scope3" );
+    scope3.width = scope3.width;
+    sctx3 = axesOnCanvas( scope3, "orange", scope3.width/20 );
+    x3=0; y3=-1; z3=1;
+    d3=0.03;
+    t3=0;
+}
+
+function loop3()
+{
+    // Draw x, y, z points on the scope trace
+    point( sctx3, t3, x3, "red" );
+    point( sctx3, t3, y3, "green" );
+    point( sctx3, t3, z3, "blue" );
+    t3 += d3/2;
+    
+    // Iterate once
+    x3 = x3 - (d3*y3) + (d3*z3);
+    y3 = y3 + (d3*x3) - (d3*z3);
+    z3 = z3 - (d3*x3) + (d3*y3);
+    
+    if( t3 > 1000 ) stopstart3();
+    if( running3 ) setTimeout( loop3, delay3 );
+}
+
+//]]>
+</script>
+</head>
+
+<body onload="stopstart()">
+
+<h3>Fast iterative circles (and ellipses, and other figures).</h3>
+Here's the entire algorithm to compute points on an elliptical arc, very quickly:
+<pre>
+    while(true)
+    {
+        x += d * y;
+        y -= d * x;
+    }
+</pre>
+
+<div>
+Attributed to Marvin Minsky, 1972: <a href="http://w3.pppl.gov/~hammett/work/2009/AIM-239-ocr.pdf">HAKMEM, MIT AI Memo 239</a> (HTML version <a href="http://home.pipeline.com/~hbaker1/hakmem/hacks.html#item149">here</a>).  
+Also on a PDP-1, <a href="http://www.computer-history.info/Page2.dir/pages/Mapes.html">David Mapes</a> talks about finding it independently.  
+I've been using this to make circles since I found it by accident in the early 1980s (using a BBC Micro).  Nowadays I'm using it to make music synthesizers (running on ARM Cortex M4).
+<br/>
+<input type="button" value="start" id="run" onclick="stopstart()" />
+<input type="button" value="clear" id="clr" onclick="init()" />
+</div>
+
+<div>
+<canvas id="grid" width="500" height="500">
+<p>This requires HTML5 canvas.  Please try a different browser.</p>
+</canvas>
+<canvas id="scope" width="500" height="500">
+<p>This requires HTML5 canvas.  Please try a different browser.</p>
+</canvas>
+</div>
+
+<div>
+Points per cycle <input type="number" id="freq" value="200" onblur="var d=deltacalc(parseFloat(this.value)); edx.value=d; edx.blur(); edy.value=d; edy.blur();" />
+dx <input type="text" id="dx" value="0.03" onblur="dx=this.value" />
+dy <input type="text" id="dy" value="0.03" onblur="dy=this.value" /><br/>
+Initial
+x <input type="number" id="x" value="0.0" onblur="x=parseFloat(this.value)" />
+y <input type="number" id="y" value="1.0" onblur="y=parseFloat(this.value)" /><br/>
+Loop delay (ms) <input type="number" id="delay" value="50" onblur="delay=parseFloat(this.value)" />
+<br/><br/>
+</div>
+
+<div>
+Initial conditions should put (x,y) on a unit circle somewhere, e.g. (0,1). But it works at any scale.<br/>
+<br/>
+The delta (d) is almost exactly 6/(number of points per cycle).  To be exact: d=2.sin(pi/points). It's stable for d&lt;2.
+Small values produce more-circular circles, i.e. phases closer to 90&deg;.  Note that the sines & cosines are perfect, it's only the phase difference that's skewed.  
+If you want to fix the phase, just use (y+prev_y)/2 instead of y.  
+See HAKMEM items 151 & 152 for some analysis.<br/>
+<br/>
+This page uses default Javascript numbers (IEEE double).
+It's also very robust with integers, fractional integers (q7, q15, etc), although you'll want to saturate (clip at +/-1 rather than wrap around).
+This makes it nicely applicable to microcontrollers and other small hardware.  You could use it to carve arcs, drive LEDs, make sound.<br/>
+<br/>
+If the delta is an expression such as "0.1 * Math.pow(x,4)", you can generate some interesting nonlinear cycles.
+Many nonlinear deltas will diverge rapidly.  I haven't yet found good simple equations that produce continuous "chaotic" loops.
+But you can go very wild with <a href="http://nbickford.wordpress.com/2011/04/03/the-minsky-circle-algorithm/">floor</a> and <a href="http://jsbin.com/umurar/11/edit">modulo</a> arithmetic.<br/>
+<br/>
+</div>
+
+<hr>
+<div>
+The same principle can be applied to 3-phase:    x = x-d.y+d.z;  y = y+d.x-d.z;  z = z-d.x+d.y; (and presumably to higher numbers too).<br/>
+<input type="button" value="start" id="run3" onclick="stopstart3()" />
+<input type="button" value="clear" id="clr3" onclick="init3()" />
+</div>
+<div>
+<canvas id="scope3" width="500" height="300">
+<p>This requires HTML5 canvas.  Please try a different browser.</p>
+</canvas>
+</div>
+
+<hr>
+<div>
+There are a couple other fast iterative algorithms for making sines and cosines, using recurrence relations to calculate sin(n) from sin(n-1) and sin(n-2).  
+These can be faster than the Minsky algorith, some implementations only needing a single multiply.  But with fixed-point math they have more problems with rounding and stability.  See:<br/>
+<a href="http://steve.hollasch.net/cgindex/math/inccos.html">Steve Hollasch</a><br/>
+<a href="http://brainwagon.org/2008/01/07/sines-and-cosines-of-the-times/">Mark VandeWettering</a><br/>
+<a href="http://ccrma.stanford.edu/~jos/wgo/wgo.pdf">The Second-Order Digital Waveguide Oscillator</a> (Smith &amp; Cook)<br/>
+<a href="http://cnmat.berkeley.edu/system/files/attachments/00759867.pdf">A Fixed-Point Recursive Digital Oscillator For Additive Synthesis Of Audio</a> (Hodes et al)<br/>
+<br/>
+<br/>
+</div>
+
+<hr>
+<div>
+<i>&#104;&#x70;&#121;&#x6C;&#x65; &#64;&#20;&#99;&#x61;&#x62;&#101;&#x7A;&#x61;&#108;&#46;&#x63;&#111;&#x6D;</i>
+</div>
+
+</body>
+</html>
