@@ -60,7 +60,7 @@ The central loop is expressed in SIMD instructions, using [smuad](http://tech.mu
     b[i] = __PKHBT(q,p,2);
     
 Including the register loads, this comes to about 7 machine instructions per iteration.
-I'm very interested in suggestions to optimize this further.
+I'm very interested in suggestions to optimize this further.  Every cycle counts!
 
 
 Generating the Overtones
@@ -73,13 +73,27 @@ Additionally, the higher harmonics can have a smll upward frequency skew, which 
 and also makes the phase relationships within the note change over time.
 
 A second method builds "drum-like" sounds.  The frequencies of the overtones are related by being zeros of the Bessel functions.
-They're strangely inharmonic, but very familiar.  My goal is to make something that can sounds like a tabla or floor tom or kettledrum or glockenspiel.
+They're strangely inharmonic, but very familiar.  My goal is to make something that can sound like a tabla or floor tom or kettledrum or glockenspiel.
 
 I'm hoping that some interesting sounds can be made by combining these two methods together.  Perhaps the beginning of a sound can be "drumlike" and its decay
 turn "stringlike" -- or, maybe a sustained sound can become increasingly "stringlike".
 
 But already there are too many degrees of freedom.  The design now needs to *narrow* the set of choices, to have only two or three dimensions,
 that can be smoothly controlled with sliders or other input mechanisms to create a wide and interesting palette.
+
+
+Results
+---
+
+Input will be MIDI.  The current code supports traditional MIDI Hardware input.
+This should be extended to include USB serial MIDI, and also to trigger using interrupts instead of a polling loop.
+
+Right now I think the synth is just about capable of 6-note polyphony with 12 overtones per note.  My intention is to have that scale automatically.
+If fewer notes are sounding, more of their overtones should be calculated.  While more are sounding, each should have fewer overtones calculated as needed to fit the time budget.
+I don't expect audible problems if those numbers are changed dynamically.
+
+To make a production-ready synth, it should be quite possible to run multiple Teensy chips in parallel, each computing some subset of the notes played!
+
 
 
 Additional reading
