@@ -21,8 +21,8 @@ The sinewaves for a root note and a series of its harmonics (partials) can be ca
 to produce rich and interesting sounds.  The interesting dimensions of this are
 
 * How many partials can be calculated at once,
-* The initial amplitude relationships between those partials,
-* The way those amplitudes (and possibly frequencies) change over time.
+* The initial frequency, amplitude and phase relationships between those partials,
+* The way those frequencies and amplitudes change over time.
 
 
 Dependencies
