@@ -31,13 +31,13 @@ Dependencies
 * [Teensy3](http://www.pjrc.com/teensy/).
 * [Arduino library for WM8731 stereo codec](https://github.com/hughpyle/machinesalem-arduino-libs/tree/master/WM8731).
 * [Arduino library for I2S](https://github.com/hughpyle/teensy-i2s).
-* [ARM math and CMSIS](http://forum.pjrc.com/threads/14845-T3-linking-libarm_cortexM3l_math-a).  The easiest way to obtain CMSIS is to install Arduino 1.5 and then look in hardware/arduino/sam/system/CMSIS for documentation and pre-built M4 libraries.
+* [ARM math and CMSIS](http://forum.pjrc.com/threads/14845-T3-linking-libarm_cortexM3l_math-a).  The easiest way to obtain CMSIS is to install Arduino 1.5 and then look in hardware/arduino/sam/system/CMSIS for documentation and pre-built M4 libraries.  You'll need to have "arm_math.h" in the project or on your include path, and add "teensy3.build.additionalobject1=/your/path/to/libarm_cortexM4l_math.a" into boards.txt for the linker.
 
 
 Core Oscillator
 ---
 
-This project uses the "Minsky magic circle" algorithm, which I like owing to its extreme stability.  The central loop of the oscillator is 
+This project uses the [Minsky magic circle](http://cabezal.com/misc/minsky-circles.html) algorithm, which I like owing to its extreme stability.  The central loop of the oscillator is 
 
     x' = gain * x  +  delta * y
     y' = gain * y  -  delta * x'
@@ -48,7 +48,7 @@ The data layout used in this implementation is an array of (16-bit) word pairs a
 and another array of (16-bit) x, y values b[]=[x][y][x][y]...
 
 I'm using Q15 fractional integer representation for the number values.  With Q15, the value ranges from 0x8000 (-32768 fractional, or -1.0) to 0x7FFF (1.0-epsilon).
-The central loop is expressed in SIMD instructions as
+The central loop is expressed in SIMD instructions, using [smuad](http://tech.munts.com/MCU/Frameworks/ARM/stm32f4/libs/STM32F4xx_DSP_StdPeriph_Lib_V1.0.1/Libraries/CMSIS/Documentation/CMSIS_CM4_SIMD.htm#__SMUAD) (dual 16-bit multiply and add) and [smusdx](http://tech.munts.com/MCU/Frameworks/ARM/stm32f4/libs/STM32F4xx_DSP_StdPeriph_Lib_V1.0.1/Libraries/CMSIS/Documentation/CMSIS_CM4_SIMD.htm#__SMUSDX) (dual 16-bit exchange, multiply and subtract) instructions:
 
     // x' = [0.5]*[x] + [delta]*[y], as Q30
     int32_t p = __SMUAD(a[i],b[i]);
