@@ -1,8 +1,8 @@
 directsynth
 ===
 
-An experimental additive synthesizer using Teensy 3.0.
-The Teensy board uses an Arm Cortex M4 clocked at 100MHz.  That should be fast enough for a small realtime additive synth.
+An experimental MIDI audio synthesizer using Teensy 3.0.
+The Teensy board uses an ARM Cortex M4 clocked at 100MHz.  That should be fast enough for a small realtime additive synth.
 
 
 Status
@@ -14,11 +14,11 @@ Experimental.  In progress.  Not for government work.  YMMV.
 Background
 ---
 
-This project is a simple additive synthesizer.
+This project is a simple additive music synthesizer.
 
-An additive synthesizer generates sequences of wave values -- in this case very pure sine waves -- and adds them together.
+An additive synthesizer generates many sequences of wave values -- in this case very pure sine waves -- and adds them together.
 The sinewaves for a root note and a series of its harmonics (partials) can be calculated in real time, then summed (with appropriate phase and amplitude),
-to produce rich and interesting sounds.  The interesting dimensions of this are
+to produce rich and varied sounds.  The interesting dimensions of this are
 
 * How many partials can be calculated at once,
 * The initial frequency, amplitude and phase relationships between those partials,
@@ -99,9 +99,10 @@ To make a production-ready synth, it should be quite possible to run multiple Te
 Additional reading
 ---
 
-* Smith, J.O; Cook, P.R (1999_ "The Second-Order Digital Waveguide Oscillator"
-* Hodes, T; Hauser, J; Wawrzynek, J; Freed, A; Wessel, D (1999) "A Fixed-Point Recursive Digital Oscillator for Additive Synthesis of Audio"
-* Legge, K.A; Fletcher, N.H (1989) "Nonlinearity, chaos, and the sound of shallow gongs"
-* Fletcher, N.H (1993) "Nonlinear Dynamics and Chaos in Musical Instruments"
-* Chaigne, A; Touze´, C; Thomas, O (2005) "Nonlinear vibrations and chaos in gongs and cymbals"
+* Smith, J.O; Cook, P.R (1999) "The Second-Order Digital Waveguide Oscillator" [here](https://ccrma.stanford.edu/~jos/wgo/wgo.pdf)
+* Hodes, T; Hauser, J; Wawrzynek, J; Freed, A; Wessel, D (1999) "A Fixed-Point Recursive Digital Oscillator for Additive Synthesis of Audio" [here](http://cnmat.berkeley.edu/system/files/attachments/00759867.pdf)
+* Errede S, UIUC Physics 193 (2002) "Vibrations of Circular Membranes (e.g. Drums) and Circular Plates" [here](http://courses.physics.illinois.edu/phys193/Lecture_Notes/P193_Lect4_Ch4_Part2.pdf)
+* Legge, K.A; Fletcher, N.H (1989) "Nonlinearity, chaos, and the sound of shallow gongs" [here](http://www.ausgo.unsw.edu.au/music/people/publications/Leggeetal1989.pdf)
+* Fletcher, N.H (1993) "Nonlinear Dynamics and Chaos in Musical Instruments" [here](http://www.ausgo.unsw.edu.au/music/people/publications/Fletcher1993c.pdf)
+* Chaigne, A; Touze´, C; Thomas, O (2005) "Nonlinear vibrations and chaos in gongs and cymbals" [here](https://www.jstage.jst.go.jp/article/ast/26/5/26_5_403/_pdf)
 
