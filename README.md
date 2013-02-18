@@ -47,7 +47,8 @@ where the gain value should be fixed at 1.0 (slightly smaller values will make t
 The data layout used in this implementation is an array of (16-bit) word pairs a[]=[d][g][d][g]...
 and another array of (16-bit) x, y values b[]=[x][y][x][y]...
 
-I'm using Q15 fractional integer representation for the number values.  With Q15, the value ranges from 0x8000 (-32768 fractional, or -1.0) to 0x7FFF (1.0-epsilon).
+I'm using Q15 fractional integer representation for the number values.  With Q15, the value ranges from 0x8000 (-32768 fractional, or -1.0) to 0x7FFF (32767 fractional, 1.0-epsilon or 0.9999695).
+Actually the gain value is scaled by half, so we can express a gain of exactly 1.0, or more, or less.
 The central loop is expressed in SIMD instructions, using [smuad](http://tech.munts.com/MCU/Frameworks/ARM/stm32f4/libs/STM32F4xx_DSP_StdPeriph_Lib_V1.0.1/Libraries/CMSIS/Documentation/CMSIS_CM4_SIMD.htm#__SMUAD) (dual 16-bit multiply and add) and [smusdx](http://tech.munts.com/MCU/Frameworks/ARM/stm32f4/libs/STM32F4xx_DSP_StdPeriph_Lib_V1.0.1/Libraries/CMSIS/Documentation/CMSIS_CM4_SIMD.htm#__SMUSDX) (dual 16-bit exchange, multiply and subtract) instructions:
 
     // x' = [0.5]*[x] + [delta]*[y], as Q30
